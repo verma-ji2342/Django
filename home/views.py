@@ -13,40 +13,42 @@ class PersonViewSet(viewsets.ModelViewSet):
     """
     PersonViewSet class
     """
+
     queryset = Person.objects.all()
     serializer_class = PeopleSerializer
 
 
-@api_view(['GET', 'POST'])
+@api_view(["GET", "POST"])
 def index(request):
     """
     index function
     """
     print(request.method)
     courses = {
-        'course_name': "python django",
-        "tutor" : "Pranjal",
+        "course_name": "python django",
+        "tutor": "Pranjal",
         "validity": "3 months",
     }
 
     return Response(courses)
 
-@api_view(['GET', 'POST'])
+
+@api_view(["GET", "POST"])
 def person(request):
     """
     person function
     """
 
-    if request.method == 'GET':
+    if request.method == "GET":
         objs = Person.objects.all()
         print(objs)
-        serializer = PeopleSerializer(objs, many = True)
-        return  Response(serializer.data)
-    
+        serializer = PeopleSerializer(objs, many=True)
+        return Response(serializer.data)
+
     else:
         data = request.data
         print(data)
-        serializer = PeopleSerializer(data = data)
+        serializer = PeopleSerializer(data=data)
         print(serializer)
         print("*********************")
         if serializer.is_valid():
@@ -54,3 +56,28 @@ def person(request):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
+
+
+@api_view(["GET", "POST", "PUT", "PATCH"])
+def edit_person(request):
+    """
+    PUT function
+    """
+    print("----------------------------------------")
+    if request.method == "PUT":
+        data = request.data
+        serializer = PeopleSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+
+    if request.method == "PATCH":
+        data = request.data
+        obj = Person.objects.get(id = data['id'])
+        serializer = PeopleSerializer(obj, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+    return Response({"message": "Hit a PUT request"})
