@@ -28,3 +28,4 @@ class PeopleSerializer(serializers.ModelSerializer):
         if any (c in special_characters for c in name):
             raise serializers.ValidationError('Name should not contain any special character')        
         return name
+git 
