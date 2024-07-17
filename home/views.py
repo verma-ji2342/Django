@@ -81,3 +81,27 @@ def edit_person(request):
             serializer.save()
             return Response(serializer.data)
     return Response({"message": "Hit a PUT request"})
+
+
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+def delete_data(request):
+    
+    if request.method == 'DELETE':
+        print('----------------------------------------------------')
+        data = request.data
+        try:
+            obj = Person.objects.get(id = data['id'])
+            print(obj)
+            obj.delete()
+            return Response({
+                'msg' : 'Data has been deleted comppletely from database'
+            })
+        except: 
+            return Response({
+                "msg" : "Something went wrong with input DATA"
+            })
+
+    
+    return Response({
+        'msg' : 'hit the correct method DELETE'
+    })
