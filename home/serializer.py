@@ -25,3 +25,11 @@ class PeopleSerializer(serializers.ModelSerializer):
     
     def get_country(self, data):
         return "India"
+    
+
+class LoginSerializer(serializers.Serializer):
+    """
+    email verification
+    """
+    email = serializers.EmailField()
+    password = serializers.CharField()

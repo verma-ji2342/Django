@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import viewsets
 from home.models import Person
-from home.serializer import PeopleSerializer
+from home.serializer import PeopleSerializer, LoginSerializer
 
 
 class PersonViewSet(viewsets.ModelViewSet):
@@ -105,3 +105,13 @@ def delete_data(request):
     return Response({
         'msg' : 'hit the correct method DELETE'
     })
+
+@api_view(['POST'])
+def login(request):
+    data = request.data
+    serializer = LoginSerializer(data=data)
+    if serializer.is_valid():
+        return Response({
+            "msg": "success"
+        })
+    return Response(serializer.errors)
