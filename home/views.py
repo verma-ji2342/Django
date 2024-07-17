@@ -9,6 +9,7 @@ from home.models import Person
 from home.serializer import PeopleSerializer, LoginSerializer
 from rest_framework.views import APIView
 
+
 class PersonViewSet(viewsets.ModelViewSet):
     """
     PersonViewSet class
@@ -75,7 +76,7 @@ def edit_person(request):
 
     if request.method == "PATCH":
         data = request.data
-        obj = Person.objects.get(id = data['id'])
+        obj = Person.objects.get(id=data["id"])
         serializer = PeopleSerializer(obj, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -83,38 +84,31 @@ def edit_person(request):
     return Response({"message": "Hit a PUT request"})
 
 
-@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@api_view(["GET", "POST", "PUT", "DELETE"])
 def delete_data(request):
-    
-    if request.method == 'DELETE':
-        print('----------------------------------------------------')
+
+    if request.method == "DELETE":
+        print("----------------------------------------------------")
         data = request.data
         try:
-            obj = Person.objects.get(id = data['id'])
+            obj = Person.objects.get(id=data["id"])
             print(obj)
             obj.delete()
-            return Response({
-                'msg' : 'Data has been deleted comppletely from database'
-            })
-        except: 
-            return Response({
-                "msg" : "Something went wrong with input DATA"
-            })
+            return Response({"msg": "Data has been deleted comppletely from database"})
+        except:
+            return Response({"msg": "Something went wrong with input DATA"})
 
-    
-    return Response({
-        'msg' : 'hit the correct method DELETE'
-    })
+    return Response({"msg": "hit the correct method DELETE"})
 
-@api_view(['POST'])
+
+@api_view(["POST"])
 def login(request):
     data = request.data
     serializer = LoginSerializer(data=data)
     if serializer.is_valid():
-        return Response({
-            "msg": "success"
-        })
+        return Response({"msg": "success"})
     return Response(serializer.errors)
+
 
 class testingAPI(APIView):
     """
@@ -129,7 +123,6 @@ class testingAPI(APIView):
         print(objs)
         serializer = PeopleSerializer(objs, many=True)
         return Response(serializer.data)
-    
 
     def post(self, request):
         """
@@ -157,32 +150,45 @@ class testingAPI(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
-    
+
     def patch(self, request):
         """
         FATCH method
         """
         data = request.data
-        obj = Person.objects.get(id = data['id'])
+        obj = Person.objects.get(id=data["id"])
         serializer = PeopleSerializer(obj, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-    
+
     def delete(self, request):
         """
         DELETE method
         """
         data = request.data
         try:
-            obj = Person.objects.get(id = data['id'])
+            obj = Person.objects.get(id=data["id"])
             print(obj)
             obj.delete()
-            return Response({
-                'msg' : 'Data has been deleted comppletely from database'
-            })
-        except: 
-            return Response({
-                "msg" : "Something went wrong with input DATA"
-            })
-    
+            return Response({"msg": "Data has been deleted comppletely from database"})
+        except:
+            return Response({"msg": "Something went wrong with input DATA"})
+
+
+# Handle all the CRUD APIs by using model view set
+class PeopleViewSet(viewsets.ModelViewSet):
+    serializer_class = PeopleSerializer
+    queryset = Person.objects.all()
+
+    # def list(self, request):
+    #     search = request.GET.get("search")
+    #     print(search)
+    #     queryset = self.queryset
+    #     if search:
+    #         queryset = queryset.filter(name__startswith=search)
+
+    #     serializer = PeopleSerializer(queryset, many=True)
+    #     if serializer.is_valid():
+    #         return Response({"message": "success", "data": serializer.data})
+    #     return Response({"message": "Failed"})
