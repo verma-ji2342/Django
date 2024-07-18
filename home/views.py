@@ -274,24 +274,25 @@ class PeopleViewSet(viewsets.ModelViewSet):
     serializer_class = PeopleSerializer
     queryset = Person.objects.all()
 
-    # def list(self, request):
-    #     search = request.GET.get("search")
-    #     queryset = self.queryset
-    #     try:
-    #         print(search)
-    #         if search:
-    #             queryset = queryset.filter(name__startswith=search)
-    #             print("query set", queryset)
+    def list(self, request):
+        search = request.GET.get("search")
+        queryset = self.queryset
+        try:
+            print(queryset)
+            if search:
+                queryset = queryset.filter(name__startswith=search)
 
-    #         serializer = PeopleSerializer(queryset, many=True)
-    #         if serializer.is_valid():
-    #             return Response({"message": "success", "data": serializer.data})
-    #     except Exception as e:
-    #         return Response({"message": "Failed"})
+            serializer = PeopleSerializer(data=queryset, many=True)
+            print(serializer.is_valid())
+            return Response({"message": "success", "data": serializer.data})
+            
+        except Exception as e:
+            return Response({"message": "Failed"})
 
 
-    @action(detail=True, methods=['get'])
+    @action(detail=False, methods=['get'])
     def send_get_email(self, request):
+        print(request.data)
         print("this is get request")
         return Response({
             'msg' : "thanx for visiting our API"
