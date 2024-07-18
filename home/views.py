@@ -2,18 +2,33 @@
 View.py
 """
 
+# for class views
 from rest_framework.decorators import api_view
+# for responding 
 from rest_framework.response import Response
 from rest_framework import viewsets
 from home.models import Person
 from home.serializer import PeopleSerializer, LoginSerializer, RegisterSerializer
 from rest_framework.views import APIView
+
+# for responding errors
 from rest_framework import status
 
-
+# for registrations and login 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
+
+#for token verification and all
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+
+
+# for pagination
+from  django.core.paginator import Paginator
+
+#for action in django 
+from rest_framework.decorators import action
 
 
 class LoginAPI(APIView):
@@ -174,14 +189,33 @@ class testingAPI(APIView):
     testing api
     """
 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
     def get(self, request):
         """
         GET method
         """
-        objs = Person.objects.all()
-        print(objs)
-        serializer = PeopleSerializer(objs, many=True)
-        return Response(serializer.data)
+        try:
+            print(request.user)  # which user is logedin
+            objs = Person.objects.all()
+            page = request.GET.get('page', 1)
+            page_size = 3
+            paginator = Paginator(objs, page_size)
+            print(objs)
+            serializer = PeopleSerializer(paginator.page(page), many=True)
+            return Response(serializer.data)
+        
+        except Exception as e:
+            return Response({
+                'status' : False,
+                'message': 'Invalid Page'
+            })
+        
+
+        
+
+
 
     def post(self, request):
         """
@@ -242,12 +276,23 @@ class PeopleViewSet(viewsets.ModelViewSet):
 
     # def list(self, request):
     #     search = request.GET.get("search")
-    #     print(search)
     #     queryset = self.queryset
-    #     if search:
-    #         queryset = queryset.filter(name__startswith=search)
+    #     try:
+    #         print(search)
+    #         if search:
+    #             queryset = queryset.filter(name__startswith=search)
+    #             print("query set", queryset)
 
-    #     serializer = PeopleSerializer(queryset, many=True)
-    #     if serializer.is_valid():
-    #         return Response({"message": "success", "data": serializer.data})
-    #     return Response({"message": "Failed"})
+    #         serializer = PeopleSerializer(queryset, many=True)
+    #         if serializer.is_valid():
+    #             return Response({"message": "success", "data": serializer.data})
+    #     except Exception as e:
+    #         return Response({"message": "Failed"})
+
+
+    @action(detail=True, methods=['get'])
+    def send_get_email(self, request):
+        print("this is get request")
+        return Response({
+            'msg' : "thanx for visiting our API"
+        })
